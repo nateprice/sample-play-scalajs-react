@@ -2,7 +2,6 @@ package example
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
-import shared.SharedMessages
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.all._, ScalazReact._
@@ -11,30 +10,42 @@ import org.scalajs.dom
 
 object Calc {
 
-  case class State(display: String, a: String, b: String)
-
-  class Backend(t: BackendScope[String, State]) {
-    def onChangeA(e: ReactEventI) =
-      t.modState(_.copy(a = e.target.value))
-    def onChangeB(e: ReactEventI) =
-      t.modState(_.copy(b = e.target.value))
-      
-    def operate(op: Char)(e: ReactEventI) = {
-      e.preventDefault()
-      t.modState(_.copy(display = op.toString))
+  case class State(display: String, a: Int, b: Int) {
+    def calculate(c: Char) = c match {
+      case '+' => this.copy(display = "" + (a + b))
+      case '-' => this.copy(display = "" + (a - b))
+      case '*' => this.copy(display = "" + (a * b))
+      case '/' => this.copy(display = if (b == 0) "error" else "" + (a / b))
     }
   }
 
+  class Backend(t: BackendScope[String, State]) {
+    def onChange(first: Boolean)(e: ReactEventI) =
+      t.modState(s =>
+        try {
+          if (first) s.copy(a = Integer.parseInt(e.target.value))
+          else s.copy(b = Integer.parseInt(e.target.value))
+        } catch {
+          case e: Throwable => s.copy(display = "error")
+        })
+
+    def operate(op: Char)(e: ReactEventI) = {
+      e.preventDefault()
+      t.modState(_.calculate(op))
+    }
+
+  }
+
   val App = ReactComponentB[String]("Calc").
-    initialState(State("0", "", "")).
+    initialState(State("0", 0, 0)).
     backend(x => new Backend(x)).
     render((_, S, B) => {
       form(
         span(S.display), br,
         input(`type` := "text", name := "a",
-          onChange ==> B.onChangeB), br,
+          onChange ==> B.onChange(true)), br,
         input(`type` := "text", name := "b",
-          onChange ==> B.onChangeB), br,
+          onChange ==> B.onChange(false)), br,
         button("+", onClick ==> B.operate('+')),
         button("-", onClick ==> B.operate('-')),
         button("*", onClick ==> B.operate('*')),
@@ -67,7 +78,7 @@ object ToDoExample {
     .initialState(State(Nil, ""))
     .renderS((T, _, S) => // Using renderS instead of render to get T (`this` in JS).
       div(
-        h3(SharedMessages.itWorks),
+        h3("hello"),
         TodoList(S.items),
         form(onSubmit ~~> T._runState(handleSubmit))(
           input(
@@ -79,7 +90,7 @@ object ToDoExample {
 
 object Hello {
   val helloMessage = ReactComponentB[String]("HelloMessage")
-    .render(name => div(SharedMessages.itWorks, name))
+    .render(name => div("hello", name))
     .build
 
 }
@@ -93,7 +104,7 @@ object ScalaJSExample extends js.JSApp {
     //dom.alert("hello")
 
     val h = g.document.getElementById("scalajsShoutOut")
-    h.textContent = SharedMessages.itWorks
+    h.textContent = "hello"
 
     val node = dom.document.getElementById("scalajsShoutOut")
 
