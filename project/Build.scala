@@ -32,7 +32,7 @@ object ApplicationBuild extends Build with UniversalKeys {
 
   lazy val scalajvmSettings =
     Seq(
-      name := "play-example",
+      name := "mobilesites-server",
       version := Versions.app,
       scalaVersion := Versions.scala,
       scalajsOutputDir := (classDirectory in Compile).value / "public" / "javascripts",
@@ -51,18 +51,23 @@ object ApplicationBuild extends Build with UniversalKeys {
 
   lazy val scalajsSettings =
     scalaJSSettings ++ Seq(
-      name := "scalajs-example",
+      name := "mobilesites-client",
       version := Versions.app,
       scalaVersion := Versions.scala,
       persistLauncher := true,
       persistLauncher in Test := false,
       relativeSourceMaps := true,
-      libraryDependencies ++= Dependencies.scalajs.value
+      libraryDependencies ++= Dependencies.scalajs.value,
+      libraryDependencies += "com.github.japgolly.scalajs-react" %%% "core" % "0.7.0",
+      libraryDependencies += "com.github.japgolly.scalajs-react" %%% "extra" % "0.7.0",
+      libraryDependencies += "com.github.japgolly.scalajs-react" %%% "ext-scalaz70" % "0.7.0",
+      libraryDependencies += "com.github.japgolly.scalajs-react" %%% "ext-monocle" % "0.7.0",
+      jsDependencies += "org.webjars" % "react" % "0.12.1" / "react-with-addons.js" commonJSName "React"
     ) ++ sharedDirectorySettings
 
   lazy val sharedScalaSettings =
     Seq(
-      name := "shared-scala-example",
+      name := "mobilesites-shared",
       libraryDependencies ++= Dependencies.shared.value
     )
 
