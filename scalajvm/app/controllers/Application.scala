@@ -5,6 +5,10 @@ import shared.SharedMessages
 
 object Application extends Controller {
 
+  def example = Action {
+    Ok(views.html.example(SharedMessages.itWorks))
+  }
+
   def index = Action {
     Ok(views.html.index(SharedMessages.itWorks))
   }

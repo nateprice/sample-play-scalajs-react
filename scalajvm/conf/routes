@@ -4,6 +4,8 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /example                    controllers.Application.example
+
 
 # Scala source map files
 GET     /scala/*path                controllers.SourceMaps.scalaFile(path)
